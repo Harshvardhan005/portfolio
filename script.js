@@ -65,7 +65,7 @@ const ease = (t) => 1 - Math.pow(1 - t, 3); // ease-out cubic
   })();
 
   /* hover class on interactive elements */
-  const targets = 'a, button, .sk-chip, .card, .contact-email, .soc-btn';
+  const targets = 'a, button, .sk-chip, .card, .yt-card, .yt-filter-btn, .yt-play-btn, .yt-act-btn, .yt-expand-btn, .contact-email, .soc-btn';
   qsa(targets).forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('ch'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('ch'));
@@ -186,7 +186,7 @@ function typewriter() {
 (function magnetic() {
   if (window.matchMedia('(pointer: coarse)').matches) return;
 
-  const targets = '.btn, .soc-btn, .top-link, .nav-brand';
+  const targets = '.btn, .soc-btn, .top-link, .nav-brand, .yt-play-btn, .yt-expand-btn';
   qsa(targets).forEach(el => {
     el.addEventListener('mousemove', (e) => {
       const r  = el.getBoundingClientRect();
@@ -203,8 +203,9 @@ function typewriter() {
    ══════════════════════════════════════════════════════ */
 (function cardTilt() {
   if (window.matchMedia('(pointer: coarse)').matches) return;
-  qsa('.card').forEach(card => {
+  qsa('.card, .yt-card').forEach(card => {
     card.addEventListener('mousemove', (e) => {
+      if (card.querySelector('.yt-thumb-wrap.is-playing')) return;
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -216,6 +217,7 @@ function typewriter() {
       card.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-8px)`;
     });
     card.addEventListener('mouseleave', () => {
+      if (card.querySelector('.yt-thumb-wrap.is-playing')) return;
       card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color .35s, box-shadow .45s';
       card.style.transform = '';
     });
@@ -284,4 +286,177 @@ function typewriter() {
       l.style.color = active ? 'var(--txt)' : '';
     });
   }, { passive: true });
+})();
+
+/* ══════════════════════════════════════════════════════
+   11. YOUTUBE VIDEO SHOWCASE & THEATER MODAL
+   ══════════════════════════════════════════════════════ */
+(function ytShowcase() {
+  const modal          = qs('#yt-modal');
+  const modalBackdrop  = qs('#yt-modal-backdrop');
+  const modalClose     = qs('#yt-modal-close');
+  const modalSlot      = qs('#yt-modal-player-slot');
+  const modalTitle     = qs('#yt-modal-title');
+  const modalClient    = qs('#yt-modal-client');
+  const modalYtBtn     = qs('#yt-modal-yt-btn');
+  const filterBtns     = qsa('.yt-filter-btn');
+  const cards          = qsa('.yt-card');
+
+  /* Helper to stop all playing inline videos */
+  function stopAllInline() {
+    qsa('.yt-thumb-wrap.is-playing').forEach(wrap => {
+      wrap.classList.remove('is-playing');
+      const slot = wrap.querySelector('.yt-player-slot');
+      if (slot) slot.innerHTML = '';
+      const card = wrap.closest('.yt-card');
+      if (card) card.style.transform = '';
+    });
+  }
+
+  /* Play inline inside card */
+  function playInline(wrap) {
+    if (!wrap) return;
+    const videoId = wrap.dataset.videoId;
+    if (!videoId) return;
+
+    /* Stop other playing videos first */
+    qsa('.yt-thumb-wrap.is-playing').forEach(other => {
+      if (other !== wrap) {
+        other.classList.remove('is-playing');
+        const s = other.querySelector('.yt-player-slot');
+        if (s) s.innerHTML = '';
+      }
+    });
+
+    const slot = wrap.querySelector('.yt-player-slot');
+    if (!slot) return;
+
+    wrap.classList.add('is-playing');
+    slot.innerHTML = `
+      <iframe
+        class="yt-iframe"
+        src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1"
+        title="${wrap.dataset.title || 'YouTube Video'}"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    `;
+  }
+
+  /* Open in Theater Lightbox Modal */
+  function openModal(wrap) {
+    if (!wrap || !modal) return;
+    const videoId = wrap.dataset.videoId;
+    const title   = wrap.dataset.title || 'YouTube Video';
+    const client  = wrap.dataset.client || '';
+    if (!videoId) return;
+
+    /* Stop any active inline video so audio doesn't overlap */
+    stopAllInline();
+
+    if (modalTitle)  modalTitle.textContent  = title;
+    if (modalClient) modalClient.textContent = client;
+    if (modalYtBtn)  modalYtBtn.href         = `https://www.youtube.com/watch?v=${videoId}`;
+
+    if (modalSlot) {
+      modalSlot.innerHTML = `
+        <iframe
+          class="yt-iframe"
+          src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1"
+          title="${title}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      `;
+    }
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  /* Close Modal */
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    if (modalSlot) modalSlot.innerHTML = '';
+    document.body.style.overflow = '';
+  }
+
+  if (modalClose)    modalClose.addEventListener('click', closeModal);
+  if (modalBackdrop) modalBackdrop.addEventListener('click', closeModal);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.classList.contains('open')) {
+      closeModal();
+    }
+  });
+
+  /* Card events */
+  cards.forEach(card => {
+    const wrap       = card.querySelector('.yt-thumb-wrap');
+    const playBtn    = card.querySelector('.yt-play-btn');
+    const actPlayBtn = card.querySelector('.yt-act-btn--play');
+    const expandBtn  = card.querySelector('.yt-expand-btn');
+
+    if (playBtn) {
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playInline(wrap);
+      });
+    }
+
+    if (actPlayBtn) {
+      actPlayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playInline(wrap);
+      });
+    }
+
+    if (wrap) {
+      wrap.addEventListener('click', (e) => {
+        if (wrap.classList.contains('is-playing')) return;
+        if (e.target.closest('.yt-expand-btn')) return;
+        playInline(wrap);
+      });
+    }
+
+    if (expandBtn) {
+      expandBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openModal(wrap);
+      });
+    }
+  });
+
+  /* Category Filtering */
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+
+      const filter = btn.dataset.filter;
+      cards.forEach(card => {
+        const cat = card.dataset.category;
+        const matches = (filter === 'all' || cat === filter);
+        if (matches) {
+          card.classList.remove('hidden');
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.96) translateY(12px)';
+          setTimeout(() => {
+            card.style.transition = 'opacity .4s var(--ease), transform .4s var(--ease)';
+            card.style.opacity = '1';
+            card.style.transform = '';
+          }, 40);
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
 })();
