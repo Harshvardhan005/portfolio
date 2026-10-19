@@ -75,6 +75,9 @@ const ease = (t) => 1 - Math.pow(1 - t, 3); // ease-out cubic
 /* ══════════════════════════════════════════════════════
    3. NAVIGATION  (scroll state + mobile menu)
    ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   3. NAVIGATION  (scroll state + mobile menu)
+   ══════════════════════════════════════════════════════ */
 (function nav() {
   const navEl  = qs('#nav');
   const burger = qs('#burger');
@@ -98,7 +101,9 @@ const ease = (t) => 1 - Math.pow(1 - t, 3); // ease-out cubic
 
   burger.addEventListener('click', () => setMenu(!open));
 
-  qsa('.mob-link').forEach(l => l.addEventListener('click', () => setMenu(false)));
+  qsa('.mob-link, .mob-soc-icon, .mob-email-link').forEach(l => {
+    l.addEventListener('click', () => setMenu(false));
+  });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && open) setMenu(false);
@@ -142,13 +147,24 @@ function typewriter() {
    5. SCROLL REVEAL  (IntersectionObserver)
    ══════════════════════════════════════════════════════ */
 (function scrollReveal() {
+  const isMobile = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches;
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       entry.target.classList.add('in');
+
+      // Trigger high-end luminous shimmer sweep on cards when revealed
+      if (entry.target.classList.contains('card') || entry.target.classList.contains('yt-card')) {
+        entry.target.classList.add('shimmer-active');
+        setTimeout(() => entry.target.classList.remove('shimmer-active'), 1400);
+      }
+
       obs.unobserve(entry.target);
     });
-  }, { threshold: 0.13, rootMargin: '0px 0px -40px 0px' });
+  }, {
+    threshold: isMobile ? 0.05 : 0.12,
+    rootMargin: isMobile ? '0px 0px -15px 0px' : '0px 0px -40px 0px'
+  });
 
   qsa('.reveal').forEach(el => obs.observe(el));
 })();
@@ -157,6 +173,7 @@ function typewriter() {
    6. COUNTER ANIMATION  (for stats)
    ══════════════════════════════════════════════════════ */
 (function counters() {
+  const isMobile = window.innerWidth <= 768;
   const cObs = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
@@ -166,16 +183,20 @@ function typewriter() {
       cObs.unobserve(el);
 
       const target   = parseInt(el.dataset.target, 10);
-      const duration = 1900;
+      const duration = 1800;
       const startT   = performance.now();
 
       (function update(now) {
         const t      = Math.min((now - startT) / duration, 1);
         el.textContent = Math.round(ease(t) * target);
-        if (t < 1) requestAnimationFrame(update);
+        if (t < 1) {
+          requestAnimationFrame(update);
+        } else {
+          el.closest('.stat-val')?.classList.add('counted');
+        }
       })(startT);
     });
-  }, { threshold: 0.6 });
+  }, { threshold: isMobile ? 0.2 : 0.55 });
 
   qsa('.stat-n').forEach(el => cObs.observe(el));
 })();
@@ -221,6 +242,82 @@ function typewriter() {
       card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color .35s, box-shadow .45s';
       card.style.transform = '';
     });
+  });
+})();
+
+/* ══════════════════════════════════════════════════════
+   7.6 MOBILE TACTILE TOUCH & 3D INTERACTION
+   ══════════════════════════════════════════════════════ */
+(function mobileInteractions() {
+  const touchTargets = qsa('.btn, .soc-btn, .sk-chip, .card, .yt-card, .yt-filter-btn, .yt-play-btn, .yt-act-btn, .yt-expand-btn, .top-link, .burger, .mob-link');
+
+  touchTargets.forEach(el => {
+    el.addEventListener('touchstart', () => {
+      el.classList.add('touch-press');
+    }, { passive: true });
+
+    el.addEventListener('touchend', () => {
+      setTimeout(() => el.classList.remove('touch-press'), 160);
+    }, { passive: true });
+
+    el.addEventListener('touchcancel', () => {
+      el.classList.remove('touch-press');
+    }, { passive: true });
+  });
+
+  /* Mobile card tactile 3D touch response */
+  const cards = qsa('.card, .yt-card');
+  cards.forEach(card => {
+    let isTouching = false;
+
+    card.addEventListener('touchstart', (e) => {
+      if (card.querySelector('.yt-thumb-wrap.is-playing')) return;
+      if (e.touches.length !== 1) return;
+      isTouching = true;
+      const touch = e.touches[0];
+      const rect = card.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      const midX = rect.width / 2;
+      const midY = rect.height / 2;
+      const rotX = ((y - midY) / midY) * -3.5;
+      const rotY = ((x - midX) / midX) * 3.5;
+
+      card.style.transition = 'transform 0.15s ease-out, box-shadow 0.25s';
+      card.style.transform = `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(0.985)`;
+    }, { passive: true });
+
+    card.addEventListener('touchmove', (e) => {
+      if (!isTouching || card.querySelector('.yt-thumb-wrap.is-playing')) return;
+      const touch = e.touches[0];
+      const rect = card.getBoundingClientRect();
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      if (x < -20 || x > rect.width + 20 || y < -20 || y > rect.height + 20) {
+        card.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s';
+        card.style.transform = '';
+        isTouching = false;
+        return;
+      }
+
+      const midX = rect.width / 2;
+      const midY = rect.height / 2;
+      const rotX = ((y - midY) / midY) * -3;
+      const rotY = ((x - midX) / midX) * 3;
+      card.style.transform = `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(0.985)`;
+    }, { passive: true });
+
+    const resetCard = () => {
+      if (!isTouching) return;
+      isTouching = false;
+      card.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s';
+      card.style.transform = '';
+    };
+
+    card.addEventListener('touchend', resetCard, { passive: true });
+    card.addEventListener('touchcancel', resetCard, { passive: true });
   });
 })();
 
@@ -460,3 +557,23 @@ function typewriter() {
     });
   });
 })();
+
+/* ══════════════════════════════════════════════════════
+   12. SCROLL PROGRESS BAR
+   ══════════════════════════════════════════════════════ */
+(function scrollProgressBar() {
+  const bar = qs('#scroll-progress');
+  if (!bar) return;
+
+  function update() {
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    if (docH <= 0) return;
+    const progress = Math.min(100, Math.max(0, (window.scrollY / docH) * 100));
+    bar.style.width = `${progress}%`;
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+})();
+

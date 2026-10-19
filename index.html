@@ -31,6 +31,7 @@
 
   <!-- ── Navigation ────────────────────────────────────── -->
   <nav class="nav" id="nav" role="navigation" aria-label="Primary navigation">
+    <div class="scroll-progress-bar" id="scroll-progress" aria-hidden="true"></div>
     <div class="nav-inner">
       <a href="#home" class="nav-brand" aria-label="Back to top">HV</a>
       <ul class="nav-links" role="list">
@@ -52,13 +53,29 @@
 
   <!-- ── Mobile overlay nav ────────────────────────────── -->
   <div class="mob-nav" id="mob-nav" role="dialog" aria-hidden="true" aria-label="Mobile navigation">
-    <ul class="mob-links" role="list">
-      <li><a href="#about"   class="mob-link">About</a></li>
-      <li><a href="#work"    class="mob-link">Work</a></li>
-      <li><a href="#videos"  class="mob-link">YouTube</a></li>
-      <li><a href="#skills"  class="mob-link">Skills</a></li>
-      <li><a href="#contact" class="mob-link">Contact</a></li>
-    </ul>
+    <div class="mob-nav-glow" aria-hidden="true"></div>
+    <div class="mob-nav-content">
+      <ul class="mob-links" role="list">
+        <li><a href="#about"   class="mob-link"><span class="mob-num">01</span>About</a></li>
+        <li><a href="#work"    class="mob-link"><span class="mob-num">02</span>Work</a></li>
+        <li><a href="#videos"  class="mob-link"><span class="mob-num">03</span>YouTube</a></li>
+        <li><a href="#skills"  class="mob-link"><span class="mob-num">04</span>Skills</a></li>
+        <li><a href="#contact" class="mob-link"><span class="mob-num">05</span>Contact</a></li>
+      </ul>
+      <div class="mob-footer">
+        <a href="mailto:harshvardhan20050@gmail.com" class="mob-email-link">harshvardhan20050@gmail.com</a>
+        <div class="mob-soc-row">
+          <a href="https://www.instagram.com/harshvardhan_04/" target="_blank" rel="noopener noreferrer" class="mob-soc-icon" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor" stroke="none"/></svg>
+            <span>Instagram</span>
+          </a>
+          <a href="https://www.linkedin.com/in/harshvardhan-k-a909692b3/" target="_blank" rel="noopener noreferrer" class="mob-soc-icon" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7H10V9h4v1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            <span>LinkedIn</span>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <main id="main-content">
