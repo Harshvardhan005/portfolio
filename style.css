@@ -772,8 +772,8 @@ body.ch .cur-ring { width: 52px; height: 52px; border-color: rgba(var(--gr), .65
 /* Grid & Cards */
 .yt-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
 }
 .yt-card {
   display: flex;

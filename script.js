@@ -539,8 +539,9 @@ function typewriter() {
 
       const filter = btn.dataset.filter;
       cards.forEach(card => {
-        const cat = card.dataset.category;
-        const matches = (filter === 'all' || cat === filter);
+        const cat = card.dataset.category || '';
+        const cats = cat.split(/\s+/);
+        const matches = (filter === 'all' || cats.includes(filter));
         if (matches) {
           card.classList.remove('hidden');
           card.style.opacity = '0';
