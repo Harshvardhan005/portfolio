@@ -578,3 +578,31 @@ function typewriter() {
   update();
 })();
 
+
+/* ══════════════════════════════════════════════════════
+   13. ORB PARALLAX  (mouse-driven depth interaction)
+   ══════════════════════════════════════════════════════ */
+(function orbParallax() {
+  const field = qs('#orb-field');
+  if (!field || window.matchMedia('(pointer: coarse)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const orbs   = qsa('.orb', field);
+  const depths = [0.025, 0.04, 0.03, 0.018, 0.045];
+  let tx = 0, ty = 0, cx = 0, cy = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    tx = e.clientX - window.innerWidth  / 2;
+    ty = e.clientY - window.innerHeight / 2;
+  });
+
+  (function tick() {
+    cx += (tx - cx) * 0.04;
+    cy += (ty - cy) * 0.04;
+    orbs.forEach((orb, i) => {
+      const d = depths[i] || 0.025;
+      orb.style.translate = `${cx * d}px ${cy * d}px`;
+    });
+    requestAnimationFrame(tick);
+  })();
+})();

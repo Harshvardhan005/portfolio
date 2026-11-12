@@ -500,6 +500,247 @@ body.ch .cur-ring { width: 52px; height: 52px; border-color: rgba(var(--gr), .65
 }
 
 /* ============================================================
+   HERO — Floating Orb Background & Glassmorphism
+   ============================================================ */
+
+/* Dark theme base overrides */
+.hero         { background: #242424; }
+.hero-body    { z-index: 5; }
+.scroll-hint  { z-index: 5; }
+
+/* Dark ambient bg layer */
+.hero-dark-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 110%, rgba(90, 35, 10, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(120, 40, 10, 0.08) 0%, transparent 55%),
+    #242424;
+}
+
+/* Nav colours on dark hero */
+.nav:not(.scrolled) .nav-brand       { color: #ffffff; }
+.nav:not(.scrolled) .nav-link        { color: rgba(255, 255, 255, 0.6); }
+.nav:not(.scrolled) .nav-link:hover  { color: #ffffff; }
+.nav:not(.scrolled) .nav-link::after { background: rgba(255, 255, 255, 0.7); }
+.nav:not(.scrolled) .burger {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.nav:not(.scrolled) .b-bar { background: #ffffff; }
+
+/* Orb field container */
+.orb-field {
+  position: absolute; inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Base orb */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Orb 1 — Large orange, top-right (partially cropped) */
+.orb-1 {
+  width: 420px; height: 420px;
+  top: -10%; right: -6%;
+  background: radial-gradient(circle at 35% 28%,
+    #ffcf9f 0%, #ff9a56 16%, #ff6b35 34%,
+    #e8501a 52%, #b83a10 72%,
+    rgba(80, 20, 5, 0.5) 100%);
+  box-shadow:
+    0 0 80px 20px rgba(255, 140, 60, 0.35),
+    0 0 160px 60px rgba(255, 107, 53, 0.12),
+    inset 0 -20px 60px rgba(0, 0, 0, 0.25);
+  animation: orbFloat1 20s ease-in-out infinite, orbGlow 9s ease-in-out infinite alternate;
+}
+
+/* Orb 2 — Medium red, left side (partially cropped) */
+.orb-2 {
+  width: 310px; height: 310px;
+  top: 32%; left: -10%;
+  background: radial-gradient(circle at 40% 30%,
+    #ff8a7a 0%, #e63946 22%, #d62828 42%,
+    #a4161a 65%,
+    rgba(60, 10, 10, 0.45) 100%);
+  box-shadow:
+    0 0 70px 20px rgba(230, 57, 70, 0.3),
+    0 0 140px 50px rgba(214, 40, 40, 0.1),
+    inset 0 -18px 50px rgba(0, 0, 0, 0.2);
+  animation: orbFloat2 24s ease-in-out infinite, orbGlow 11s ease-in-out infinite alternate-reverse;
+}
+
+/* Orb 3 — Small coral, bottom-left */
+.orb-3 {
+  width: 175px; height: 175px;
+  bottom: 14%; left: 9%;
+  background: radial-gradient(circle at 38% 32%,
+    #ffd4a8 0%, #ff9a56 20%, #ff7f50 42%,
+    #d45a2a 68%,
+    rgba(90, 25, 10, 0.45) 100%);
+  box-shadow:
+    0 0 50px 15px rgba(255, 127, 80, 0.3),
+    0 0 100px 40px rgba(255, 127, 80, 0.08),
+    inset 0 -14px 40px rgba(0, 0, 0, 0.2);
+  animation: orbFloat3 18s ease-in-out infinite, orbGlow 8s ease-in-out infinite alternate;
+}
+
+/* Orb 4 — Blurred deep crimson, bottom-right (partially cropped) */
+.orb-4 {
+  width: 340px; height: 340px;
+  bottom: -14%; right: -4%;
+  background: radial-gradient(circle at 42% 30%,
+    #ff6b6b 0%, #c9372c 28%, #8b0000 52%,
+    rgba(50, 5, 5, 0.5) 100%);
+  filter: blur(6px);
+  box-shadow:
+    0 0 90px 30px rgba(139, 0, 0, 0.22),
+    0 0 180px 60px rgba(139, 0, 0, 0.08);
+  animation: orbFloat4 22s ease-in-out infinite, orbGlow 13s ease-in-out infinite alternate-reverse;
+}
+
+/* Orb 5 — Small warm accent, behind glass edge (depth layer) */
+.orb-5 {
+  width: 160px; height: 160px;
+  top: 22%; right: 20%;
+  background: radial-gradient(circle at 36% 30%,
+    #ffb088 0%, #f4845f 28%, #c44d1a 58%,
+    rgba(80, 20, 5, 0.35) 100%);
+  filter: blur(3px);
+  opacity: 0.7;
+  box-shadow:
+    0 0 45px 14px rgba(244, 132, 95, 0.24),
+    0 0 90px 35px rgba(244, 132, 95, 0.08);
+  animation: orbFloat5 16s ease-in-out infinite, orbGlow 10s ease-in-out infinite alternate;
+}
+
+@keyframes orbGlow {
+  0%   { opacity: 0.84; }
+  100% { opacity: 1; }
+}
+
+/* Orb float keyframes — organic, asymmetric, non-mechanical */
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  18%  { transform: translate(-28px, 16px) scale(1.03); }
+  36%  { transform: translate(12px, -24px) scale(0.98); }
+  54%  { transform: translate(-16px, -10px) scale(1.02); }
+  72%  { transform: translate(20px, 14px) scale(0.97); }
+  88%  { transform: translate(-8px, -18px) scale(1.01); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  22%  { transform: translate(22px, -26px) scale(1.04) rotate(2.5deg); }
+  44%  { transform: translate(-14px, 16px) scale(0.97) rotate(-1.5deg); }
+  66%  { transform: translate(8px, -12px) scale(1.01) rotate(1deg); }
+  88%  { transform: translate(-18px, 20px) scale(1.03) rotate(-2deg); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  28%  { transform: translate(16px, -18px) scale(1.05); }
+  56%  { transform: translate(-14px, 22px) scale(0.96); }
+  84%  { transform: translate(10px, -8px) scale(1.02); }
+}
+@keyframes orbFloat4 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  30%  { transform: translate(-20px, -16px) scale(1.03) rotate(-2.5deg); }
+  60%  { transform: translate(14px, 10px) scale(0.98) rotate(1.5deg); }
+  85%  { transform: translate(-10px, -20px) scale(1.01) rotate(-1deg); }
+}
+@keyframes orbFloat5 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  24%  { transform: translate(-12px, 18px) scale(1.06); }
+  48%  { transform: translate(14px, -14px) scale(0.95); }
+  72%  { transform: translate(-8px, -10px) scale(1.03); }
+}
+
+/* Glassmorphism hero panel */
+.glass-hero-panel {
+  position: relative;
+  z-index: 2;
+  background: rgba(30, 30, 32, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 16px;
+  padding: 56px 52px;
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  box-shadow:
+    0 12px 44px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: center;
+}
+.glass-hero-panel .hero-name {
+  font-size: clamp(36px, 7.5vw, 88px);
+  letter-spacing: -2.5px;
+}
+.glass-hero-panel .hero-role { justify-content: center; }
+.glass-hero-panel .hero-desc { margin-left: auto; margin-right: auto; }
+.glass-hero-panel .hero-cta  { justify-content: center; }
+
+/* Hero dark-theme text overrides */
+.hero-tag  { color: rgba(255, 255, 255, 0.5); }
+.hero-name { color: #ffffff; }
+.hero-role { color: rgba(255, 255, 255, 0.45); }
+.hero-desc { color: rgba(255, 255, 255, 0.45); }
+.hero-desc strong { color: rgba(255, 255, 255, 0.78); }
+
+/* Hero buttons on dark bg */
+.hero .btn-fill {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(var(--gr), 0.35);
+}
+.hero .btn-fill:hover {
+  background: #cf8c2e;
+  border-color: #cf8c2e;
+  box-shadow: 0 14px 36px rgba(var(--gr), 0.5);
+}
+.hero .btn-ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+.hero .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Scroll hint on dark hero */
+.hero .scroll-hint span { color: rgba(255, 255, 255, 0.3); }
+.hero .sh-line { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent); }
+
+/* Orb responsive scaling */
+@media (max-width: 900px) {
+  .orb-1 { width: 300px; height: 300px; }
+  .orb-2 { width: 220px; height: 220px; }
+  .orb-4 { width: 250px; height: 250px; }
+  .orb-5 { width: 100px; height: 100px; }
+  .glass-hero-panel { padding: 44px 36px; }
+}
+@media (max-width: 640px) {
+  .orb-1 { width: 200px; height: 200px; top: -6%; right: -10%; }
+  .orb-2 { width: 160px; height: 160px; }
+  .orb-3 { width: 110px; height: 110px; }
+  .orb-4 { width: 180px; height: 180px; }
+  .orb-5 { width: 75px; height: 75px; top: 14%; right: 6%; }
+  .glass-hero-panel { padding: 36px 28px; border-radius: 14px; }
+}
+@media (max-width: 480px) {
+  .glass-hero-panel { padding: 32px 22px; }
+}
+
+/* ============================================================
    ABOUT
    ============================================================ */
 .about-grid {
