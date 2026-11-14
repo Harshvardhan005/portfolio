@@ -580,28 +580,44 @@ function typewriter() {
 
 
 /* ══════════════════════════════════════════════════════
-   13. ORB PARALLAX  (mouse-driven depth interaction)
+   13. ORB PARALLAX & SCROLL DEPTH  (whole-site interaction)
    ══════════════════════════════════════════════════════ */
 (function orbParallax() {
   const field = qs('#orb-field');
-  if (!field || window.matchMedia('(pointer: coarse)').matches) return;
+  if (!field) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const orbs   = qsa('.orb', field);
-  const depths = [0.025, 0.04, 0.03, 0.018, 0.045];
-  let tx = 0, ty = 0, cx = 0, cy = 0;
+  const orbs          = qsa('.orb', field);
+  const mouseDepths   = [0.025, 0.04, 0.03, 0.018, 0.045, 0.035, 0.038, 0.022];
+  const scrollFactors = [-0.14, 0.12, -0.08, 0.15, -0.1, 0.13, -0.11, 0.09];
+  const isTouch       = window.matchMedia('(pointer: coarse)').matches;
 
-  document.addEventListener('mousemove', (e) => {
-    tx = e.clientX - window.innerWidth  / 2;
-    ty = e.clientY - window.innerHeight / 2;
-  });
+  let tx = 0, ty = 0, cx = 0, cy = 0;
+  let targetScrollY = window.scrollY || 0;
+  let currentScrollY = window.scrollY || 0;
+
+  if (!isTouch) {
+    document.addEventListener('mousemove', (e) => {
+      tx = e.clientX - window.innerWidth  / 2;
+      ty = e.clientY - window.innerHeight / 2;
+    });
+  }
+
+  window.addEventListener('scroll', () => {
+    targetScrollY = window.scrollY;
+  }, { passive: true });
 
   (function tick() {
     cx += (tx - cx) * 0.04;
     cy += (ty - cy) * 0.04;
+    currentScrollY += (targetScrollY - currentScrollY) * 0.06;
+
     orbs.forEach((orb, i) => {
-      const d = depths[i] || 0.025;
-      orb.style.translate = `${cx * d}px ${cy * d}px`;
+      const md = mouseDepths[i] || 0.025;
+      const sf = scrollFactors[i] || 0.1;
+      const x = isTouch ? 0 : cx * md;
+      const y = (isTouch ? 0 : cy * md) + (currentScrollY * sf);
+      orb.style.translate = `${x}px ${y}px`;
     });
     requestAnimationFrame(tick);
   })();
