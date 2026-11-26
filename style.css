@@ -919,6 +919,21 @@ body.ch .cur-ring { width: 52px; height: 52px; border-color: rgba(var(--gr), .85
   background: #0d0d0d;
   border-color: rgba(255, 255, 255, 0.12);
 }
+.card-avatar-box--yt {
+  background: linear-gradient(135deg, #180505 0%, #2a0b0b 100%);
+  border-color: rgba(255, 0, 0, 0.25);
+}
+.card-avatar-yt-icon {
+  width: 44px;
+  height: 44px;
+  color: #ff0033;
+  filter: drop-shadow(0 4px 12px rgba(255, 0, 51, 0.45));
+  transition: transform .4s var(--ease), filter .4s var(--ease);
+}
+.card:hover .card-avatar-yt-icon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 6px 18px rgba(255, 0, 51, 0.7));
+}
 .card-avatar-img {
   width: 100%; height: 100%;
   object-fit: cover;
