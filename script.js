@@ -622,3 +622,41 @@ function typewriter() {
     requestAnimationFrame(tick);
   })();
 })();
+
+/* ══════════════════════════════════════════════════════
+   13. CARD HOVER VIDEO PREVIEW (MUTED)
+   ══════════════════════════════════════════════════════ */
+(function hoverVideoPreview() {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+
+  const hoverCards = qsa('.card[data-hover-video]');
+  hoverCards.forEach(card => {
+    const videoId = card.dataset.hoverVideo;
+    const slot = card.querySelector('.card-video-slot');
+    if (!videoId || !slot) return;
+
+    let hoverTimeout = null;
+
+    card.addEventListener('mouseenter', () => {
+      hoverTimeout = setTimeout(() => {
+        if (!card.classList.contains('has-video-preview')) {
+          card.classList.add('has-video-preview');
+          slot.innerHTML = `
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0&playsinline=1"
+              allow="autoplay; encrypted-media"
+              tabindex="-1"
+              aria-hidden="true">
+            </iframe>
+          `;
+        }
+      }, 180);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      clearTimeout(hoverTimeout);
+      card.classList.remove('has-video-preview');
+      slot.innerHTML = '';
+    });
+  });
+})();

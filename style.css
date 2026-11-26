@@ -893,6 +893,35 @@ body.ch .cur-ring { width: 52px; height: 52px; border-color: rgba(var(--gr), .85
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
 }
+.card-video-slot {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .45s var(--ease);
+  overflow: hidden;
+}
+.card-video-slot iframe {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 177.78%; height: 177.78%;
+  transform: translate(-50%, -50%);
+  border: none;
+  pointer-events: none;
+}
+.card.has-video-preview .card-video-slot {
+  opacity: 1;
+}
+.card.has-video-preview .card-avatar-box {
+  transform: scale(0.86) translateY(-8px);
+  opacity: 0.25;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+.card.has-video-preview:hover .card-avatar-box {
+  opacity: 0.92;
+  transform: scale(0.96) translateY(-2px);
+}
 .card-grad {
   position: absolute; inset: 0;
   background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.06) 0%, rgba(0, 0, 0, 0.45) 100%);
