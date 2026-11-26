@@ -624,33 +624,41 @@ function typewriter() {
 })();
 
 /* ══════════════════════════════════════════════════════
-   13. CARD HOVER VIDEO PREVIEW (MUTED)
+   13. CARD HOVER VIDEO PREVIEW (MUTED & RANDOMIZED)
    ══════════════════════════════════════════════════════ */
 (function hoverVideoPreview() {
   if (window.matchMedia('(pointer: coarse)').matches) return;
 
-  const hoverCards = qsa('.card[data-hover-video]');
+  const hoverCards = qsa('.card[data-hover-videos], .card[data-hover-video]');
   hoverCards.forEach(card => {
-    const videoId = card.dataset.hoverVideo;
+    const rawVideos = card.dataset.hoverVideos || card.dataset.hoverVideo || '';
+    const videoList = rawVideos.split(',').map(v => v.trim()).filter(Boolean);
     const slot = card.querySelector('.card-video-slot');
-    if (!videoId || !slot) return;
+    if (!videoList.length || !slot) return;
 
     let hoverTimeout = null;
+    let lastIdx = -1;
 
     card.addEventListener('mouseenter', () => {
       hoverTimeout = setTimeout(() => {
-        if (!card.classList.contains('has-video-preview')) {
-          card.classList.add('has-video-preview');
-          slot.innerHTML = `
-            <iframe
-              src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0&playsinline=1"
-              allow="autoplay; encrypted-media"
-              tabindex="-1"
-              aria-hidden="true">
-            </iframe>
-          `;
+        // Pick a randomized video (avoiding immediate repeat if possible)
+        let randIdx = Math.floor(Math.random() * videoList.length);
+        if (videoList.length > 1 && randIdx === lastIdx) {
+          randIdx = (randIdx + 1) % videoList.length;
         }
-      }, 180);
+        lastIdx = randIdx;
+        const videoId = videoList[randIdx];
+
+        card.classList.add('has-video-preview');
+        slot.innerHTML = `
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&playsinline=1"
+            allow="autoplay; encrypted-media"
+            tabindex="-1"
+            aria-hidden="true">
+          </iframe>
+        `;
+      }, 160);
     });
 
     card.addEventListener('mouseleave', () => {
