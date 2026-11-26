@@ -62,7 +62,7 @@ button { font-family: inherit; }
   z-index: 2;
 }
 .sect  {
-  padding: clamp(84px, 13vw, 140px) 0;
+  padding: clamp(48px, 7vw, 76px) 0;
   position: relative;
   z-index: 2;
   background: transparent;
@@ -857,7 +857,7 @@ body.ch .cur-ring { width: 52px; height: 52px; border-color: rgba(var(--gr), .85
 /* ============================================================
    WORK
    ============================================================ */
-.sect-hd { margin-bottom: 56px; }
+.sect-hd { margin-bottom: 36px; }
 .sect-h {
   font-size: clamp(32px, 5.5vw, 60px);
   font-weight: 800; letter-spacing: -2.5px; line-height: 1.1;
