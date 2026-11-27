@@ -970,7 +970,7 @@ body.ch .cur-ring { width: 52px; height: 52px; border-color: rgba(var(--gr), .85
 }
 .card-avatar-img--contain {
   object-fit: contain;
-  padding: 8px;
+  padding: 0;
 }
 
 .card-badge {
